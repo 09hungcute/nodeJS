@@ -8,8 +8,12 @@ exports.register = async (req, res) => {
     const { username, gmail, password, address, fullname } = req.body;
 
     // Kiểm tra user đã tồn tại chưa
-    let user = await User.findOne({ gmail });
-    if (user) return res.status(400).json({ message: 'Email đã tồn tại' });
+    let user = await User.findOne({ username });
+    if (user) return res.status(400).json({ message: 'User đã tồn tại' });
+
+    // Kiểm tra email đã tồn tại chưa
+    let emailExists = await User.findOne({ gmail });
+    if (emailExists) return res.status(400).json({ message: 'Email đã tồn tại' });
 
     // Mã hóa password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -26,18 +30,20 @@ exports.register = async (req, res) => {
 
     res.status(201).json({ message: 'Đăng ký thành công' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Lỗi server' });
   }
 };
 
+
 // Đăng nhập user
 exports.login = async (req, res) => {
   try {
-    const { gmail, password } = req.body;
+    const { username, password } = req.body;
 
     // Kiểm tra user tồn tại không
-    const user = await User.findOne({ gmail });
-    if (!user) return res.status(400).json({ message: 'Email không tồn tại' });
+    const user = await User.findOne({ username });
+    if (!user) return res.status(400).json({ message: 'Username không tồn tại' });
 
     // Kiểm tra password
     const isMatch = await bcrypt.compare(password, user.password);
@@ -48,6 +54,7 @@ exports.login = async (req, res) => {
 
     res.json({ token, user: { id: user._id, username: user.username, gmail: user.gmail } });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Lỗi server' });
   }
 };
@@ -55,11 +62,13 @@ exports.login = async (req, res) => {
 // Lấy thông tin user
 exports.getUser = async (req, res) => {
   try {
+    // Lấy thông tin user từ token
     const user = await User.findById(req.user.id).select('-password');
     if (!user) return res.status(404).json({ message: 'User không tồn tại' });
     
     res.json(user);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Lỗi server' });
   }
 };

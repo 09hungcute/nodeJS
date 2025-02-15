@@ -12,7 +12,7 @@ exports.sendFeedback = async (req, res) => {
     try {
         const feedback = new Feedback({
             userId,  // Lưu ID người gửi feedback
-            comment,git remote add origin https://github.com/09hungcute/nodeJS.git
+            comment,
             rate
         });
 

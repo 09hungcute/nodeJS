@@ -63,7 +63,9 @@ app.get('/auth/google',
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    res.send('Đăng nhập Google thành công!');
+    const userProfile = req.user;
+    const userEmail = userProfile.emails[0].value;  // Lấy email từ hồ sơ người dùng
+    res.send(`Đăng nhập Google thành công! Email của bạn là: ${userEmail}`);
   }
 );
 

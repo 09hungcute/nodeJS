@@ -8,7 +8,7 @@ exports.authMiddleware = (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Giải mã token
+        const decoded = jwt.verify(token.split(' ')[1], process.env.JWT_SECRET); // Giải mã token
         req.user = decoded; // Lưu thông tin người dùng vào `req`
         next();
     } catch (error) {
